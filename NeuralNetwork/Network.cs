@@ -30,55 +30,38 @@ namespace NeuralNetwork
         }
 
         #region Train
-        public void Train(Dictionary<List<double>, List<double>> trainData, double learnRate = 0.1, double loss = 0)
+        public void Train(Dictionary<List<double>, List<double>> trainData, int epochs, double learnRate = 0.1)
         {
-            foreach (var data in trainData)
+            for (int e = 0; e < epochs; e++)
             {
-                List<List<double>> pred = FeedForwardTrain(data.Key);
-                List<double> dLyPred = pred.Last().Select((p, i) => -2 * (data.Value[i] - Neuron.Sigmoid(p))).ToList();
-
-                for (int l = 0; l < Neurons.Count; l++)
+                foreach (var data in trainData)
                 {
-                    for (int n = 0; n < Neurons[l].Count; n++)
-                    {
-                        List<double> dyPreddh = new List<double>();
+                    List<List<double>> pred = FeedForwardTrain(data.Key);
+                    List<double> dLyPred = pred.Last().Select((p, i) => -2 * (data.Value[i] - Neuron.Sigmoid(p))).ToList();
 
-                        for (int _l = l + 1; _l < NeuronConnetions.Count; _l++)
+                    for (int l = 0; l < Neurons.Count; l++)
+                    {
+                        for (int n = 0; n < Neurons[l].Count; n++)
                         {
-                            for (int _n = 0; _n < NeuronConnetions[_l].Count; _n++)
+                            List<double> dyPreddh = new List<double>();
+
+                            for (int _l = l + 1; _l < NeuronConnetions.Count; _l++)
                             {
-                                if (NeuronConnetions[_l][_n].Where(p => p.Key - 1 == l && p.Value == n).Count() > 0)
+                                for (int _n = 0; _n < NeuronConnetions[_l].Count; _n++)
                                 {
-                                    int weightIndex = NeuronConnetions[_l][_n].ToList().Select(c => c.Key == l + 1 && c.Value == n).ToList().IndexOf(true);
-                                    dyPreddh.Add(Neurons[_l][_n].Weights[weightIndex] * Neuron.DerivSigmoid(pred[_l + 1][_n]));
+                                    if (NeuronConnetions[_l][_n].Where(p => p.Key - 1 == l && p.Value == n).Count() > 0)
+                                    {
+                                        int weightIndex = NeuronConnetions[_l][_n].ToList().Select(c => c.Key == l + 1 && c.Value == n).ToList().IndexOf(true);
+                                        dyPreddh.Add(Neurons[_l][_n].Weights[weightIndex] * Neuron.DerivSigmoid(pred[_l + 1][_n]));
+                                    }
                                 }
                             }
+
+                            List<double> inputs = NeuronConnetions[l][n].Select(connetion => Neuron.Sigmoid(pred[connetion.Key][connetion.Value])).ToList();
+
+                            Neurons[l][n].WeightsAndBiasUpdate(dLyPred, inputs, l + 1 < Neurons.Count ? dyPreddh : null, learnRate);
                         }
-
-                        List<double> inputs = NeuronConnetions[l][n].Select(connetion => Neuron.Sigmoid(pred[connetion.Key][connetion.Value])).ToList();
-
-                        Neurons[l][n].WeightsAndBiasUpdate(dLyPred, inputs, l + 1 < Neurons.Count ? dyPreddh : null, learnRate);
                     }
-                }
-
-                if (MSELoss(data.Value, pred.Last().Select(p => Neuron.Sigmoid(p)).ToList()) <= loss)
-                {
-                    throw new Exception("MSELoss less then threshold value");
-                }
-            }
-        }
-
-        public void TrainWithTinyDataList(Dictionary<List<double>, List<double>> trainData, int repeatCount, double learnRate = 0.1, double loss = 0)
-        {
-            for (int i = 0; i < repeatCount; i++)
-            {
-                try
-                {
-                    Train(trainData, learnRate, loss);
-                }
-                catch
-                {
-                    return;
                 }
             }
         }
@@ -122,47 +105,47 @@ namespace NeuralNetwork
             return data.Last();
         }
 
-/*        public List<double> FeedBackward(List<double> inputs)
-        {
-            var neuronConnetions = new List<List<List<KeyValuePair<int, int>>>>();
-
-            for (int l = 0; l < NeuronConnetions.Count; l++)
-            {
-                neuronConnetions.Insert(0, new List<List<KeyValuePair<int, int>>>());
-
-                for (int n = 0; n < LaiersPreset[l]; n++)
+        /*      public List<double> FeedBackward(List<double> inputs)
                 {
-                    neuronConnetions[0].Add(new List<KeyValuePair<int, int>>());
-                }
-            }
+                    var neuronConnetions = new List<List<List<KeyValuePair<int, int>>>>();
 
-            for (int l = 0; l < NeuronConnetions.Count; l++)
-            {
-                for (int n = 0; n < NeuronConnetions[NeuronConnetions.Count - 1 - l].Count; n++)
-                {
-                    for (int c = 0; c < NeuronConnetions[NeuronConnetions.Count - 1 - l][n].Count; c++)
+                    for (int l = 0; l < NeuronConnetions.Count; l++)
                     {
-                        neuronConnetions[l][c].Add(new KeyValuePair<int, int>(l, n));
+                        neuronConnetions.Insert(0, new List<List<KeyValuePair<int, int>>>());
+
+                        for (int n = 0; n < LaiersPreset[l]; n++)
+                        {
+                            neuronConnetions[0].Add(new List<KeyValuePair<int, int>>());
+                        }
                     }
-                }
-            }
 
-            var network = new Network(LaiersPreset.Reverse<int>().ToList());
-
-            for (int l = 0; l < Neurons.Count; l++)
-            {
-                for (int n = 0; n < Neurons[NeuronConnetions.Count - 1 - l].Count; n++)
-                {
-                    for (int w = 0; w < Neurons[NeuronConnetions.Count - 1 - l][n].Weights.Count; w++)
+                    for (int l = 0; l < NeuronConnetions.Count; l++)
                     {
-                        
+                        for (int n = 0; n < NeuronConnetions[NeuronConnetions.Count - 1 - l].Count; n++)
+                        {
+                            for (int c = 0; c < NeuronConnetions[NeuronConnetions.Count - 1 - l][n].Count; c++)
+                            {
+                                neuronConnetions[l][c].Add(new KeyValuePair<int, int>(l, n));
+                            }
+                        }
                     }
-                }
-            }
 
-            return network.FeedForward(inputs);
-        }
-*/
+                    var network = new Network(LaiersPreset.Reverse<int>().ToList());
+
+                    for (int l = 0; l < Neurons.Count; l++)
+                    {
+                        for (int n = 0; n < Neurons[NeuronConnetions.Count - 1 - l].Count; n++)
+                        {
+                            for (int w = 0; w < Neurons[NeuronConnetions.Count - 1 - l][n].Weights.Count; w++)
+                            {
+
+                            }
+                        }
+                    }
+
+                    return network.FeedForward(inputs);
+                }
+        */
         public double MSELoss(List<double> yTrue, List<double> yPred)
         {
             if (yTrue.Count != yPred.Count)
