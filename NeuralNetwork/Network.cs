@@ -11,22 +11,43 @@ namespace NeuralNetwork
         private List<List<List<KeyValuePair<int, int>>>> NeuronConnetions { get; }
         public List<List<Neuron>> Neurons { get; }
 
-        public Network(List<int> laiersPreset) : this(laiersPreset, laiersPreset.Skip(1)
+        public Network(List<int> laiersPreset, List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<double, bool>>> bias = null, bool haveBias = true) : this(laiersPreset, laiersPreset.Skip(1)
             .Select((l, i) => Enumerable.Range(0, l)
                 .Select(n => Enumerable.Range(0, laiersPreset[i])
                     .Select(c => new KeyValuePair<int, int>(i, c))
                     .ToList())
                 .ToList())
-            .ToList())
+            .ToList(), bias, haveBias)
         { }
 
-        public Network(List<int> laiersPreset, List<List<List<KeyValuePair<int, int>>>> neuronConnetions)
+        public Network(List<int> laiersPreset, List<List<List<KeyValuePair<int, int>>>> neuronConnetions, List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<double, bool>>> bias = null, bool haveBias = true)
         {
             LaiersPreset = laiersPreset;
             NeuronConnetions = neuronConnetions;
             Neurons = laiersPreset.Skip(1).Select((l, i) => Enumerable.Range(0, l)
-            .Select(n => new Neuron(NeuronConnetions[i][n].Count))
+            .Select(n => new Neuron(NeuronConnetions[i][n].Count, haveBias ? null : 0, haveBias))
             .ToList()).ToList();
+
+            if (bias != null)
+            {
+                EditBias(bias);
+            }
+        }
+
+        public void EditBias(List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<double, bool>>> bias)
+        {
+            foreach (var item in bias)
+            {
+                try
+                {
+                    Neurons[item.Key.Key][item.Key.Value].Bias = item.Value.Key;
+                    Neurons[item.Key.Key][item.Key.Value].ChangeBias = item.Value.Value;
+                }
+                catch
+                {
+                    continue;
+                }
+            }
         }
 
         #region Train
@@ -39,9 +60,9 @@ namespace NeuralNetwork
                     List<List<double>> pred = FeedForwardTrain(data.Key);
                     List<double> dLyPred = pred.Last().Select((p, i) => -2 * (data.Value[i] - Neuron.Sigmoid(p))).ToList();
 
-                    for (int l = 0; l < Neurons.Count; l++)
+                    for (int l = Neurons.Count - 1; l > -1; l--)
                     {
-                        for (int n = 0; n < Neurons[l].Count; n++)
+                        for (int n = Neurons[l].Count - 1; n > -1; n--)
                         {
                             List<double> dyPreddh = new List<double>();
 
@@ -105,47 +126,47 @@ namespace NeuralNetwork
             return data.Last();
         }
 
-        /*      public List<double> FeedBackward(List<double> inputs)
+        public List<double> FeedBackward(List<double> inputs)
+        {
+            var neuronConnetions = new List<List<List<KeyValuePair<int, int>>>>();
+
+            for (int l = 0; l < NeuronConnetions.Count; l++)
+            {
+                neuronConnetions.Insert(0, new List<List<KeyValuePair<int, int>>>());
+
+                for (int n = 0; n < LaiersPreset[l]; n++)
                 {
-                    var neuronConnetions = new List<List<List<KeyValuePair<int, int>>>>();
-
-                    for (int l = 0; l < NeuronConnetions.Count; l++)
-                    {
-                        neuronConnetions.Insert(0, new List<List<KeyValuePair<int, int>>>());
-
-                        for (int n = 0; n < LaiersPreset[l]; n++)
-                        {
-                            neuronConnetions[0].Add(new List<KeyValuePair<int, int>>());
-                        }
-                    }
-
-                    for (int l = 0; l < NeuronConnetions.Count; l++)
-                    {
-                        for (int n = 0; n < NeuronConnetions[NeuronConnetions.Count - 1 - l].Count; n++)
-                        {
-                            for (int c = 0; c < NeuronConnetions[NeuronConnetions.Count - 1 - l][n].Count; c++)
-                            {
-                                neuronConnetions[l][c].Add(new KeyValuePair<int, int>(l, n));
-                            }
-                        }
-                    }
-
-                    var network = new Network(LaiersPreset.Reverse<int>().ToList());
-
-                    for (int l = 0; l < Neurons.Count; l++)
-                    {
-                        for (int n = 0; n < Neurons[NeuronConnetions.Count - 1 - l].Count; n++)
-                        {
-                            for (int w = 0; w < Neurons[NeuronConnetions.Count - 1 - l][n].Weights.Count; w++)
-                            {
-
-                            }
-                        }
-                    }
-
-                    return network.FeedForward(inputs);
+                    neuronConnetions[0].Add(new List<KeyValuePair<int, int>>());
                 }
-        */
+            }
+
+            for (int l = 0; l < NeuronConnetions.Count; l++)
+            {
+                for (int n = 0; n < NeuronConnetions[NeuronConnetions.Count - 1 - l].Count; n++)
+                {
+                    for (int c = 0; c < NeuronConnetions[NeuronConnetions.Count - 1 - l][n].Count; c++)
+                    {
+                        neuronConnetions[l][c].Add(new KeyValuePair<int, int>(l, n));
+                    }
+                }
+            }
+
+            var network = new Network(LaiersPreset.Reverse<int>().ToList(), neuronConnetions, haveBias: false);
+
+            for (int l = 0; l < Neurons.Count; l++)
+            {
+                for (int n = 0; n < Neurons[NeuronConnetions.Count - 1 - l].Count; n++)
+                {
+                    for (int w = 0; w < Neurons[NeuronConnetions.Count - 1 - l][n].Weights.Count; w++)
+                    {
+
+                    }
+                }
+            }
+
+            return network.FeedForward(inputs);
+        }
+
         public double MSELoss(List<double> yTrue, List<double> yPred)
         {
             if (yTrue.Count != yPred.Count)

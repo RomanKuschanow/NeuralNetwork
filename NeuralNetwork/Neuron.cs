@@ -6,18 +6,25 @@ namespace NeuralNetwork
 {
     public class Neuron
     {
-        public List<double> Weights { get; private set; }
-        public double Bias { get; private set; }
+        public List<double> Weights { get; set; }
+        public double Bias { get; set; }
+        public bool ChangeBias { get; set; }
 
-        public Neuron(int weightsCount)
+        public Neuron(int weightsCount, double? bias = null, bool changeBias = true)
         {
             RandomSet(weightsCount);
+            if (bias != null)
+            {
+                Bias = (double)bias;
+            }
+            ChangeBias = changeBias;
         }
 
-        public Neuron(List<double> weights, double bias)
+        public Neuron(List<double> weights, double bias, bool changeBias = true)
         {
             Weights = weights;
             Bias = bias;
+            ChangeBias = changeBias;
         }
 
         public void RandomSet()
@@ -58,7 +65,10 @@ namespace NeuralNetwork
                     double dhdw = inputs[i] * derivSum;
                     Weights[i] -= learnRate * dLdyPred[p] * (dyPreddh == null ? 1 : dyPreddh[p]) * dhdw;
                 }
-                Bias -= learnRate * dLdyPred[p] * (dyPreddh == null ? 1 : dyPreddh[p]) * derivSum;
+                if (ChangeBias)
+                {
+                    Bias -= learnRate * dLdyPred[p] * (dyPreddh == null ? 1 : dyPreddh[p]) * derivSum;
+                }
             }
         }
 
