@@ -13,20 +13,20 @@ namespace NeuralNetwork.Tests
 
             //Act
 
-            var XOR = new Dictionary<List<double>, List<double>>()
+            var XOR = new Dictionary<List<decimal>, List<decimal>>()
             {
-                { new List<double>() { 1, 1 },  new List<double>(){ 0 } },
-                { new List<double>() { 1, 0 },  new List<double>(){ 1 } },
-                { new List<double>() { 0, 1 },  new List<double>(){ 1 } },
-                { new List<double>() { 0, 0 },  new List<double>(){ 0 } },
+                { new List<decimal>() { 1, 1 },  new List<decimal>(){ 0 } },
+                { new List<decimal>() { 1, 0 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 0, 1 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 0, 0 },  new List<decimal>(){ 0 } },
             };
 
             sut.Train(XOR, 5000, 10);
 
-            var oneOne = sut.FeedForward(new List<double>() { 1, 1 })[0];
-            var oneZero = sut.FeedForward(new List<double>() { 1, 0 })[0];
-            var zeroOne = sut.FeedForward(new List<double>() { 0, 1 })[0];
-            var zeroZero = sut.FeedForward(new List<double>() { 0, 0 })[0];
+            var oneOne = sut.FeedForward(new List<decimal>() { 1, 1 })[0];
+            var oneZero = sut.FeedForward(new List<decimal>() { 1, 0 })[0];
+            var zeroOne = sut.FeedForward(new List<decimal>() { 0, 1 })[0];
+            var zeroZero = sut.FeedForward(new List<decimal>() { 0, 0 })[0];
 
             //Assert
             Math.Round(oneOne).Should().Be(0);

@@ -6,21 +6,21 @@ namespace NeuralNetwork
 {
     public class Neuron
     {
-        public List<double> Weights { get; set; }
-        public double Bias { get; set; }
+        public List<decimal> Weights { get; set; }
+        public decimal Bias { get; set; }
         public bool ChangeBias { get; set; }
 
-        public Neuron(int weightsCount, double? bias = null, bool changeBias = true)
+        public Neuron(int weightsCount, decimal? bias = null, bool changeBias = true)
         {
             RandomSet(weightsCount);
             if (bias != null)
             {
-                Bias = (double)bias;
+                Bias = (decimal)bias;
             }
             ChangeBias = changeBias;
         }
 
-        public Neuron(List<double> weights, double bias, bool changeBias = true)
+        public Neuron(List<decimal> weights, decimal bias, bool changeBias = true)
         {
             Weights = weights;
             Bias = bias;
@@ -35,11 +35,11 @@ namespace NeuralNetwork
         private void RandomSet(int weightsCount)
         {
             Random r = new Random();
-            Weights = Enumerable.Range(0, weightsCount).Select(i => r.NextDouble()).ToList();
-            Bias = r.NextDouble();
+            Weights = Enumerable.Range(0, weightsCount).Select(i => (decimal)r.NextDouble()).ToList();
+            Bias = (decimal)r.NextDouble();
         }
 
-        public double FeedForward(List<double> inputs)
+        public decimal FeedForward(List<decimal> inputs)
         {
             if (inputs.Count != Weights.Count)
             {
@@ -48,14 +48,14 @@ namespace NeuralNetwork
             return inputs.Select((input, i) => input * Weights[i]).Sum() + Bias;
         }
 
-        public double SigmoidFeedForward(List<double> inputs)
+        public decimal SigmoidFeedForward(List<decimal> inputs)
         {
             return Sigmoid(FeedForward(inputs));
         }
 
-        public void WeightsAndBiasUpdate(double ideal, List<double> inputs, double learnRate = 0.1)
+        public void WeightsAndBiasUpdate(decimal ideal, List<decimal> inputs, decimal learnRate = 0.1m)
         {
-            double derivS = DerivSigmoid(FeedForward(inputs));
+            decimal derivS = DerivSigmoid(FeedForward(inputs));
 
             for (int i = 0; i < Weights.Count; i++)
             {
@@ -68,15 +68,15 @@ namespace NeuralNetwork
 
         }
 
-        public static double DerivSigmoid(double x)
+        public static decimal DerivSigmoid(decimal x)
         {
-            double fx = Sigmoid(x);
+            decimal fx = Sigmoid(x);
             return fx * (1 - fx);
         }
 
-        public static double Sigmoid(double x)
+        public static decimal Sigmoid(decimal x)
         {
-            double res = 1 / (1 + Math.Exp(-x));
+            decimal res = 1 / (decimal)(1 + Math.Exp((double)-x));
             return res;
         }
     }

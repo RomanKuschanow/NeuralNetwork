@@ -11,44 +11,44 @@ namespace NeuralNetwork
             var networkNAND = new Network(new List<int>() { 2, 1 });
             var networkAND = new Network(new List<int>() { 2, 1 });
 
-            var OR = new Dictionary<List<double>, List<double>>()
+            var OR = new Dictionary<List<decimal>, List<decimal>>()
             {
-                { new List<double>() { 1, 1 },  new List<double>(){ 1 } },
-                { new List<double>() { 1, 0 },  new List<double>(){ 1 } },
-                { new List<double>() { 0, 1 },  new List<double>(){ 1 } },
-                { new List<double>() { 0, 0 },  new List<double>(){ 0 } },
+                { new List<decimal>() { 1, 1 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 1, 0 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 0, 1 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 0, 0 },  new List<decimal>(){ 0 } },
             };
 
-            var NAND = new Dictionary<List<double>, List<double>>()
+            var NAND = new Dictionary<List<decimal>, List<decimal>>()
             {
-                { new List<double>() { 1, 1 },  new List<double>(){ 0 } },
-                { new List<double>() { 1, 0 },  new List<double>(){ 1 } },
-                { new List<double>() { 0, 1 },  new List<double>(){ 1 } },
-                { new List<double>() { 0, 0 },  new List<double>(){ 1 } },
+                { new List<decimal>() { 1, 1 },  new List<decimal>(){ 0 } },
+                { new List<decimal>() { 1, 0 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 0, 1 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 0, 0 },  new List<decimal>(){ 1 } },
             };
 
-            var AND = new Dictionary<List<double>, List<double>>()
+            var AND = new Dictionary<List<decimal>, List<decimal>>()
             {
-                { new List<double>() { 1, 1 },  new List<double>(){ 1 } },
-                { new List<double>() { 1, 0 },  new List<double>(){ 0 } },
-                { new List<double>() { 0, 1 },  new List<double>(){ 0 } },
-                { new List<double>() { 0, 0 },  new List<double>(){ 0 } },
+                { new List<decimal>() { 1, 1 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 1, 0 },  new List<decimal>(){ 0 } },
+                { new List<decimal>() { 0, 1 },  new List<decimal>(){ 0 } },
+                { new List<decimal>() { 0, 0 },  new List<decimal>(){ 0 } },
             };
 
-            var XOR = new Dictionary<List<double>, List<double>>()
+            var XOR = new Dictionary<List<decimal>, List<decimal>>()
             {
-                { new List<double>() { 1, 1 },  new List<double>(){ 0 } },
-                { new List<double>() { 1, 0 },  new List<double>(){ 1 } },
-                { new List<double>() { 0, 1 },  new List<double>(){ 1 } },
-                { new List<double>() { 0, 0 },  new List<double>(){ 0 } },
+                { new List<decimal>() { 1, 1 },  new List<decimal>(){ 0 } },
+                { new List<decimal>() { 1, 0 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 0, 1 },  new List<decimal>(){ 1 } },
+                { new List<decimal>() { 0, 0 },  new List<decimal>(){ 0 } },
             };
 
             networkOR.Train(OR, 5000, 10);
 
-            var oneOne = networkOR.FeedForward(new List<double>() { 1, 1 })[0];
-            var oneZero = networkOR.FeedForward(new List<double>() { 1, 0 })[0];
-            var zeroOne = networkOR.FeedForward(new List<double>() { 0, 1 })[0];
-            var zeroZero = networkOR.FeedForward(new List<double>() { 0, 0 })[0];
+            var oneOne = networkOR.FeedForward(new List<decimal>() { 1, 1 })[0];
+            var oneZero = networkOR.FeedForward(new List<decimal>() { 1, 0 })[0];
+            var zeroOne = networkOR.FeedForward(new List<decimal>() { 0, 1 })[0];
+            var zeroZero = networkOR.FeedForward(new List<decimal>() { 0, 0 })[0];
 
             Console.WriteLine();
 
@@ -60,10 +60,10 @@ namespace NeuralNetwork
 
             networkNAND.Train(NAND, 5000, 10);
 
-            oneOne = networkNAND.FeedForward(new List<double>() { 1, 1 })[0];
-            oneZero = networkNAND.FeedForward(new List<double>() { 1, 0 })[0];
-            zeroOne = networkNAND.FeedForward(new List<double>() { 0, 1 })[0];
-            zeroZero = networkNAND.FeedForward(new List<double>() { 0, 0 })[0];
+            oneOne = networkNAND.FeedForward(new List<decimal>() { 1, 1 })[0];
+            oneZero = networkNAND.FeedForward(new List<decimal>() { 1, 0 })[0];
+            zeroOne = networkNAND.FeedForward(new List<decimal>() { 0, 1 })[0];
+            zeroZero = networkNAND.FeedForward(new List<decimal>() { 0, 0 })[0];
 
             Console.WriteLine();
 
@@ -75,28 +75,28 @@ namespace NeuralNetwork
 
             networkAND.Train(AND, 5000, 10);
 
-            oneOne = networkAND.FeedForward(new List<double>() 
+            oneOne = networkAND.FeedForward(new List<decimal>() 
             {
-                networkOR.FeedForward(new List<double>() { 1, 1 })[0],
-                networkNAND.FeedForward(new List<double>() { 1, 1 })[0] 
+                networkOR.FeedForward(new List<decimal>() { 1, 1 })[0],
+                networkNAND.FeedForward(new List<decimal>() { 1, 1 })[0] 
             })[0];
 
-            oneZero = networkAND.FeedForward(new List<double>() 
+            oneZero = networkAND.FeedForward(new List<decimal>() 
             { 
-                networkOR.FeedForward(new List<double>() { 1, 0 })[0],
-                networkNAND.FeedForward(new List<double>() { 1, 0 })[0] 
+                networkOR.FeedForward(new List<decimal>() { 1, 0 })[0],
+                networkNAND.FeedForward(new List<decimal>() { 1, 0 })[0] 
             })[0];
 
-            zeroOne = networkAND.FeedForward(new List<double>() 
+            zeroOne = networkAND.FeedForward(new List<decimal>() 
             { 
-                networkOR.FeedForward(new List<double>() { 0, 1 })[0],
-                networkNAND.FeedForward(new List<double>() { 0, 1 })[0] 
+                networkOR.FeedForward(new List<decimal>() { 0, 1 })[0],
+                networkNAND.FeedForward(new List<decimal>() { 0, 1 })[0] 
             })[0];
 
-            zeroZero = networkAND.FeedForward(new List<double>() 
+            zeroZero = networkAND.FeedForward(new List<decimal>() 
             { 
-                networkOR.FeedForward(new List<double>() { 0, 0 })[0],
-                networkNAND.FeedForward(new List<double>() { 0, 0 })[0] 
+                networkOR.FeedForward(new List<decimal>() { 0, 0 })[0],
+                networkNAND.FeedForward(new List<decimal>() { 0, 0 })[0] 
             })[0];
 
             Console.WriteLine();
@@ -113,10 +113,10 @@ namespace NeuralNetwork
 
             network.Train(XOR, 5000, 10);
 
-            oneOne = network.FeedForward(new List<double>() { 1, 1 })[0];
-            oneZero = network.FeedForward(new List<double>() { 1, 0 })[0];
-            zeroOne = network.FeedForward(new List<double>() { 0, 1 })[0];
-            zeroZero = network.FeedForward(new List<double>() { 0, 0 })[0];
+            oneOne = network.FeedForward(new List<decimal>() { 1, 1 })[0];
+            oneZero = network.FeedForward(new List<decimal>() { 1, 0 })[0];
+            zeroOne = network.FeedForward(new List<decimal>() { 0, 1 })[0];
+            zeroZero = network.FeedForward(new List<decimal>() { 0, 0 })[0];
 
             Console.WriteLine();
 
