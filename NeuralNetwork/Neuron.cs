@@ -53,23 +53,19 @@ namespace NeuralNetwork
             return Sigmoid(FeedForward(inputs));
         }
 
-        public void WeightsAndBiasUpdate(List<double> dLdyPred, List<double> inputs, List<double> dyPreddh = null, double learnRate = 0.1)
+        public void WeightsAndBiasUpdate(double ideal, List<double> inputs, double learnRate = 0.1)
         {
-            double sum = FeedForward(inputs);
-            double derivSum = DerivSigmoid(sum);
+            double derivS = DerivSigmoid(FeedForward(inputs));
 
-            for (int p = 0; p < dLdyPred.Count; p++)
+            for (int i = 0; i < Weights.Count; i++)
             {
-                for (int i = 0; i < Weights.Count; i++)
-                {
-                    double dhdw = inputs[i] * derivSum;
-                    Weights[i] -= learnRate * dLdyPred[p] * (dyPreddh == null ? 1 : dyPreddh[p]) * dhdw;
-                }
-                if (ChangeBias)
-                {
-                    Bias -= learnRate * dLdyPred[p] * (dyPreddh == null ? 1 : dyPreddh[p]) * derivSum;
-                }
+                Weights[i] -= learnRate * ideal * derivS  * inputs[i];
             }
+            if (ChangeBias)
+            {
+                Bias -= learnRate * ideal * derivS;
+            }
+
         }
 
         public static double DerivSigmoid(double x)

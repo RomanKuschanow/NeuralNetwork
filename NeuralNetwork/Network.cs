@@ -77,31 +77,22 @@ namespace NeuralNetwork
                 foreach (var data in trainData)
                 {
                     List<List<double>> pred = FeedForwardTrain(data.Key);
-                    List<double> dLyPred = pred.Last().Select((p, i) => -2 * (data.Value[i] - Neuron.Sigmoid(p))).ToList();
+                    List<List<double>> ideal = new List<List<double>>() { data.Value };
 
-                    Console.WriteLine(Math.Round(MSELoss(data.Value, pred.Last().Select(p => Neuron.Sigmoid(p)).ToList()), 4));
+                    //Console.WriteLine(Math.Round(MSELoss(data.Value, pred.Last()), 4));
 
-                    for (int l = 0; l < Neurons.Count; l++)
+                    for (int l = Neurons.Count - 1; l > -1; l--)
                     {
+                        ideal.Insert(0, new List<double>());
+
                         for (int n = 0; n < Neurons[l].Count; n++)
                         {
-                            List<double> dyPreddh = new List<double>();
 
-                            for (int _l = l + 1; _l < NeuronConnetions.Count; _l++)
-                            {
-                                for (int _n = 0; _n < NeuronConnetions[_l].Count; _n++)
-                                {
-                                    if (NeuronConnetions[_l][_n].Where(p => p.Key - 1 == l && p.Value == n).Count() > 0)
-                                    {
-                                        int weightIndex = NeuronConnetions[_l][_n].ToList().Select(c => c.Key == l + 1 && c.Value == n).ToList().IndexOf(true);
-                                        dyPreddh.Add(Neurons[_l][_n].Weights[weightIndex] * Neuron.DerivSigmoid(pred[_l + 1][_n]));
-                                    }
-                                }
-                            }
+                            List<double> inputs = NeuronConnetions[l][n].Select(connetion => pred[connetion.Key][connetion.Value]).ToList();
 
-                            List<double> inputs = NeuronConnetions[l][n].Select(connetion => Neuron.Sigmoid(pred[connetion.Key][connetion.Value])).ToList();
+                            Neurons[l][n].WeightsAndBiasUpdate(ideal[1].Select(i => 2 * (pred[l + 1][n] - i)).Sum(), inputs, learnRate);
 
-                            Neurons[l][n].WeightsAndBiasUpdate(dLyPred, inputs, l + 1 < Neurons.Count ? dyPreddh : null, learnRate);
+                            ideal[0].Add(Neurons[l][n].SigmoidFeedForward(inputs));
                         }
                     }
                 }
@@ -110,23 +101,19 @@ namespace NeuralNetwork
 
         private List<List<double>> FeedForwardTrain(List<double> inputs)
         {
-            List<List<double>> trainData = new List<List<double>>() { inputs };
             List<List<double>> data = new List<List<double>>() { inputs };
 
             for (int l = 0; l < Neurons.Count; l++)
             {
                 data.Add(new List<double>());
-                trainData.Add(new List<double>());
 
                 for (int n = 0; n < Neurons[l].Count; n++)
                 {
                     data[l + 1].Add(Neurons[l][n].SigmoidFeedForward(NeuronConnetions[l][n].Select(_n => data[_n.Key][_n.Value]).ToList()));
-                    trainData[l + 1].Add(Neurons[l][n].FeedForward(NeuronConnetions[l][n].Select(_n => data[_n.Key][_n.Value]).ToList()));
                 }
             }
 
-
-            return trainData;
+            return data;
         }
         #endregion
 
@@ -180,7 +167,10 @@ namespace NeuralNetwork
                 {
                     for (int w = 0; w < Neurons[NeuronConnetions.Count - 1 - l][n].Weights.Count; w++)
                     {
-
+                        network.EditWeight(new List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<double, int>>>()
+                        {
+                            new KeyValuePair<KeyValuePair<int, int>, KeyValuePair<double, int>>(new KeyValuePair<int, int>(l, n), new KeyValuePair<double, int>(Neurons[NeuronConnetions.Count - 1 - l][n].Weights[w], w))
+                        });
                     }
                 }
             }
@@ -195,7 +185,7 @@ namespace NeuralNetwork
                 throw new Exception("'yTrue' must have the same number of elements as 'yPred'");
             }
 
-            return (1d / yTrue.Count) * Enumerable.Range(0, yTrue.Count).Select(i => Math.Pow(yTrue[i] - yPred[i], 2)).Sum();
+            return Math.Abs(Math.Round(yTrue.Select((i, c) => 2 * (yPred[c] - i)).Sum(), 5));
         }
     }
 }
