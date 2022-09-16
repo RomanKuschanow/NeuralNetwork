@@ -99,7 +99,7 @@ namespace NeuralNetwork
                         for (int n = 0; n < Neurons[l].Count; n++)
                         {
 
-                            List<decimal> inputs = NeuronConnections[l][n].Select(connetion => pred[connetion.Key][connetion.Value]).ToList();
+                            List<decimal> inputs = NeuronConnections[l][n].Select(connection => pred[connection.Key][connection.Value]).ToList();
 
                             Neurons[l][n].WeightsAndBiasUpdate(ideal[1].Select(i => 2 * (pred[l + 1][n] - i)).Sum(), inputs, learnRate);
 
