@@ -7,25 +7,37 @@ namespace NeuralNetwork
 {
     public class Network
     {
-        private List<int> LaiersPreset { get; }
-        private List<List<List<KeyValuePair<int, int>>>> NeuronConnetions { get; }
+        private List<int> LayersPreset { get; }
+        private List<List<List<KeyValuePair<int, int>>>> NeuronConnections { get; }
         public List<List<Neuron>> Neurons { get; }
 
-        public Network(List<int> laiersPreset, List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, int>>> weight = null, List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, bool>>> bias = null, bool haveBias = true) : this(laiersPreset, laiersPreset.Skip(1)
+        public Network(
+            List<int> layersPreset,
+            List<KeyValuePair<KeyValuePair<int, int>,KeyValuePair<decimal, int>>> weight = null, 
+            List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, bool>>> bias = null, 
+            bool haveBias = true
+            ) 
+            : this(layersPreset, layersPreset.Skip(1)
             .Select((l, i) => Enumerable.Range(0, l)
-                .Select(n => Enumerable.Range(0, laiersPreset[i])
+                .Select(n => Enumerable.Range(0, layersPreset[i])
                     .Select(c => new KeyValuePair<int, int>(i, c))
                     .ToList())
                 .ToList())
             .ToList(), weight, bias, haveBias)
         { }
 
-        public Network(List<int> laiersPreset, List<List<List<KeyValuePair<int, int>>>> neuronConnetions, List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, int>>> weight = null, List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, bool>>> bias = null, bool haveBias = true)
+        public Network(
+            List<int> layersPreset, 
+            List<List<List<KeyValuePair<int, int>>>> neuronConnections, 
+            List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, int>>> weight = null,
+            List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, bool>>> bias = null, 
+            bool haveBias = true
+            )
         {
-            LaiersPreset = laiersPreset;
-            NeuronConnetions = neuronConnetions;
-            Neurons = laiersPreset.Skip(1).Select((l, i) => Enumerable.Range(0, l)
-            .Select(n => new Neuron(NeuronConnetions[i][n].Count, haveBias ? null : 0, haveBias))
+            LayersPreset = layersPreset;
+            NeuronConnections = neuronConnections;
+            Neurons = layersPreset.Skip(1).Select((l, i) => Enumerable.Range(0, l)
+            .Select(n => new Neuron(NeuronConnections[i][n].Count, haveBias ? null : 0, haveBias))
             .ToList()).ToList();
 
             if (bias != null)
@@ -88,7 +100,7 @@ namespace NeuralNetwork
                         for (int n = 0; n < Neurons[l].Count; n++)
                         {
 
-                            List<decimal> inputs = NeuronConnetions[l][n].Select(connetion => pred[connetion.Key][connetion.Value]).ToList();
+                            List<decimal> inputs = NeuronConnections[l][n].Select(connetion => pred[connetion.Key][connetion.Value]).ToList();
 
                             Neurons[l][n].WeightsAndBiasUpdate(ideal[1].Select(i => 2 * (pred[l + 1][n] - i)).Sum(), inputs, learnRate);
 
@@ -109,7 +121,7 @@ namespace NeuralNetwork
 
                 for (int n = 0; n < Neurons[l].Count; n++)
                 {
-                    data[l + 1].Add(Neurons[l][n].SigmoidFeedForward(NeuronConnetions[l][n].Select(_n => data[_n.Key][_n.Value]).ToList()));
+                    data[l + 1].Add(Neurons[l][n].SigmoidFeedForward(NeuronConnections[l][n].Select(_n => data[_n.Key][_n.Value]).ToList()));
                 }
             }
 
@@ -127,7 +139,7 @@ namespace NeuralNetwork
 
                 for (int n = 0; n < Neurons[l].Count; n++)
                 {
-                    data[l + 1].Add(Neurons[l][n].SigmoidFeedForward(NeuronConnetions[l][n].Select(_n => data[_n.Key][_n.Value]).ToList()));
+                    data[l + 1].Add(Neurons[l][n].SigmoidFeedForward(NeuronConnections[l][n].Select(_n => data[_n.Key][_n.Value]).ToList()));
                 }
             }
 
@@ -136,40 +148,40 @@ namespace NeuralNetwork
 
         public List<decimal> FeedBackward(List<decimal> inputs)
         {
-            var neuronConnetions = new List<List<List<KeyValuePair<int, int>>>>();
+            var neuronConnections = new List<List<List<KeyValuePair<int, int>>>>();
 
-            for (int l = 0; l < NeuronConnetions.Count; l++)
+            for (int l = 0; l < NeuronConnections.Count; l++)
             {
-                neuronConnetions.Insert(0, new List<List<KeyValuePair<int, int>>>());
+                neuronConnections.Insert(0, new List<List<KeyValuePair<int, int>>>());
 
-                for (int n = 0; n < LaiersPreset[l]; n++)
+                for (int n = 0; n < LayersPreset[l]; n++)
                 {
-                    neuronConnetions[0].Add(new List<KeyValuePair<int, int>>());
+                    neuronConnections[0].Add(new List<KeyValuePair<int, int>>());
                 }
             }
 
-            for (int l = 0; l < NeuronConnetions.Count; l++)
+            for (int l = 0; l < NeuronConnections.Count; l++)
             {
-                for (int n = 0; n < NeuronConnetions[NeuronConnetions.Count - 1 - l].Count; n++)
+                for (int n = 0; n < NeuronConnections[NeuronConnections.Count - 1 - l].Count; n++)
                 {
-                    for (int c = 0; c < NeuronConnetions[NeuronConnetions.Count - 1 - l][n].Count; c++)
+                    for (int c = 0; c < NeuronConnections[NeuronConnections.Count - 1 - l][n].Count; c++)
                     {
-                        neuronConnetions[l][c].Add(new KeyValuePair<int, int>(l, n));
+                        neuronConnections[l][c].Add(new KeyValuePair<int, int>(l, n));
                     }
                 }
             }
 
-            var network = new Network(LaiersPreset.Reverse<int>().ToList(), neuronConnetions, haveBias: false);
+            var network = new Network(LayersPreset.Reverse<int>().ToList(), neuronConnections, haveBias: false);
 
             for (int l = 0; l < Neurons.Count; l++)
             {
-                for (int n = 0; n < Neurons[NeuronConnetions.Count - 1 - l].Count; n++)
+                for (int n = 0; n < Neurons[NeuronConnections.Count - 1 - l].Count; n++)
                 {
-                    for (int w = 0; w < Neurons[NeuronConnetions.Count - 1 - l][n].Weights.Count; w++)
+                    for (int w = 0; w < Neurons[NeuronConnections.Count - 1 - l][n].Weights.Count; w++)
                     {
                         network.EditWeight(new List<KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, int>>>()
                         {
-                            new KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, int>>(new KeyValuePair<int, int>(l, n), new KeyValuePair<decimal, int>(Neurons[NeuronConnetions.Count - 1 - l][n].Weights[w], w))
+                            new KeyValuePair<KeyValuePair<int, int>, KeyValuePair<decimal, int>>(new KeyValuePair<int, int>(l, n), new KeyValuePair<decimal, int>(Neurons[NeuronConnections.Count - 1 - l][n].Weights[w], w))
                         });
                     }
                 }
