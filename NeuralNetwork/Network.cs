@@ -81,14 +81,13 @@ namespace NeuralNetwork
             }
         }
 
-        #region Train
         public void Train(Dictionary<List<decimal>, List<decimal>> trainData, int epochs, decimal learnRate = 0.1m)
         {
             for (int e = 0; e < epochs; e++)
             {
                 foreach (var data in trainData)
                 {
-                    List<List<decimal>> pred = FeedForwardTrain(data.Key);
+                    List<List<decimal>> pred = FeedForward(data.Key);
                     List<List<decimal>> ideal = new List<List<decimal>>() { data.Value };
 
                     //Console.WriteLine(Math.Round(MSELoss(data.Value, pred.Last()), 4));
@@ -111,7 +110,7 @@ namespace NeuralNetwork
             }
         }
 
-        private List<List<decimal>> FeedForwardTrain(List<decimal> inputs)
+        public List<List<decimal>> FeedForward(List<decimal> inputs)
         {
             List<List<decimal>> data = new List<List<decimal>>() { inputs };
 
@@ -126,24 +125,6 @@ namespace NeuralNetwork
             }
 
             return data;
-        }
-        #endregion
-
-        public List<decimal> FeedForward(List<decimal> inputs)
-        {
-            List<List<decimal>> data = new List<List<decimal>>() { inputs };
-
-            for (int l = 0; l < Neurons.Count; l++)
-            {
-                data.Add(new List<decimal>());
-
-                for (int n = 0; n < Neurons[l].Count; n++)
-                {
-                    data[l + 1].Add(Neurons[l][n].SigmoidFeedForward(NeuronConnections[l][n].Select(_n => data[_n.Key][_n.Value]).ToList()));
-                }
-            }
-
-            return data.Last();
         }
 
         public List<decimal> FeedBackward(List<decimal> inputs)
@@ -187,7 +168,7 @@ namespace NeuralNetwork
                 }
             }
 
-            return network.FeedForward(inputs);
+            return network.FeedForward(inputs).Last();
         }
 
         public decimal MSELoss(List<decimal> yTrue, List<decimal> yPred)

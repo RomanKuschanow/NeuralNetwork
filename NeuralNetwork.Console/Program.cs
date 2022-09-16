@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NeuralNetwork
 {
@@ -45,10 +46,10 @@ namespace NeuralNetwork
 
             networkOR.Train(OR, 5000, 10);
 
-            var oneOne = networkOR.FeedForward(new List<decimal>() { 1, 1 })[0];
-            var oneZero = networkOR.FeedForward(new List<decimal>() { 1, 0 })[0];
-            var zeroOne = networkOR.FeedForward(new List<decimal>() { 0, 1 })[0];
-            var zeroZero = networkOR.FeedForward(new List<decimal>() { 0, 0 })[0];
+            var oneOne = networkOR.FeedForward(new List<decimal>() { 1, 1 }).Last()[0];
+            var oneZero = networkOR.FeedForward(new List<decimal>() { 1, 0 }).Last()[0];
+            var zeroOne = networkOR.FeedForward(new List<decimal>() { 0, 1 }).Last()[0];
+            var zeroZero = networkOR.FeedForward(new List<decimal>() { 0, 0 }).Last()[0];
 
             Console.WriteLine();
 
@@ -60,10 +61,10 @@ namespace NeuralNetwork
 
             networkNAND.Train(NAND, 5000, 10);
 
-            oneOne = networkNAND.FeedForward(new List<decimal>() { 1, 1 })[0];
-            oneZero = networkNAND.FeedForward(new List<decimal>() { 1, 0 })[0];
-            zeroOne = networkNAND.FeedForward(new List<decimal>() { 0, 1 })[0];
-            zeroZero = networkNAND.FeedForward(new List<decimal>() { 0, 0 })[0];
+            oneOne = networkNAND.FeedForward(new List<decimal>() { 1, 1 }).Last()[0];
+            oneZero = networkNAND.FeedForward(new List<decimal>() { 1, 0 }).Last()[0];
+            zeroOne = networkNAND.FeedForward(new List<decimal>() { 0, 1 }).Last()[0];
+            zeroZero = networkNAND.FeedForward(new List<decimal>() { 0, 0 }).Last()[0];
 
             Console.WriteLine();
 
@@ -77,27 +78,27 @@ namespace NeuralNetwork
 
             oneOne = networkAND.FeedForward(new List<decimal>() 
             {
-                networkOR.FeedForward(new List<decimal>() { 1, 1 })[0],
-                networkNAND.FeedForward(new List<decimal>() { 1, 1 })[0] 
-            })[0];
+                networkOR.FeedForward(new List<decimal>() { 1, 1 }).Last()[0],
+                networkNAND.FeedForward(new List<decimal>() { 1, 1 }).Last()[0] 
+            }).Last()[0];
 
             oneZero = networkAND.FeedForward(new List<decimal>() 
             { 
-                networkOR.FeedForward(new List<decimal>() { 1, 0 })[0],
-                networkNAND.FeedForward(new List<decimal>() { 1, 0 })[0] 
-            })[0];
+                networkOR.FeedForward(new List<decimal>() { 1, 0 }).Last()[0],
+                networkNAND.FeedForward(new List<decimal>() { 1, 0 }).Last()[0] 
+            }).Last()[0];
 
             zeroOne = networkAND.FeedForward(new List<decimal>() 
             { 
-                networkOR.FeedForward(new List<decimal>() { 0, 1 })[0],
-                networkNAND.FeedForward(new List<decimal>() { 0, 1 })[0] 
-            })[0];
+                networkOR.FeedForward(new List<decimal>() { 0, 1 }).Last()[0],
+                networkNAND.FeedForward(new List<decimal>() { 0, 1 }).Last()[0] 
+            }).Last()[0];
 
             zeroZero = networkAND.FeedForward(new List<decimal>() 
             { 
-                networkOR.FeedForward(new List<decimal>() { 0, 0 })[0],
-                networkNAND.FeedForward(new List<decimal>() { 0, 0 })[0] 
-            })[0];
+                networkOR.FeedForward(new List<decimal>() { 0, 0 }).Last()[0],
+                networkNAND.FeedForward(new List<decimal>() { 0, 0 }).Last()[0] 
+            }).Last()[0];
 
             Console.WriteLine();
 
@@ -113,10 +114,10 @@ namespace NeuralNetwork
 
             network.Train(XOR, 5000, 10);
 
-            oneOne = network.FeedForward(new List<decimal>() { 1, 1 })[0];
-            oneZero = network.FeedForward(new List<decimal>() { 1, 0 })[0];
-            zeroOne = network.FeedForward(new List<decimal>() { 0, 1 })[0];
-            zeroZero = network.FeedForward(new List<decimal>() { 0, 0 })[0];
+            oneOne = network.FeedForward(new List<decimal>() { 1, 1 }).Last()[0];
+            oneZero = network.FeedForward(new List<decimal>() { 1, 0 }).Last()[0];
+            zeroOne = network.FeedForward(new List<decimal>() { 0, 1 }).Last()[0];
+            zeroZero = network.FeedForward(new List<decimal>() { 0, 0 }).Last()[0];
 
             Console.WriteLine();
 
